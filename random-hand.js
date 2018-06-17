@@ -4,27 +4,20 @@ var deepEqual = require('deep-equal');
 var suits = ['H', 'D', 'S', 'C'];
 var values = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
 
-var randomSuit = () => {
-  return suits[Math.floor(Math.random() * (suits.length))];
-};
-
-var randomValue = () => {
-  return values[Math.floor(Math.random() * (values.length))];
-};
-
-var randomCard = () => {
-  return randomValue() + '-' + randomSuit();
+var spliceCard = function(cardArray) {
+  var takeAway = cardArray.splice(
+    Math.floor(Math.random() * cardArray.length), 1)[0];
+  return [takeAway, cardArray];
 };
 
 var randomHand = () => {
   let cards = [];
 
-  var deckSize = 52;
-  cards.push(buildFullDeck()[Math.floor(Math.random() * deckSize)]);
-  cards.push(buildFullDeck()[Math.floor(Math.random() * deckSize)]);
-  cards.push(buildFullDeck()[Math.floor(Math.random() * deckSize)]);
-  cards.push(buildFullDeck()[Math.floor(Math.random() * deckSize)]);
-  cards.push(buildFullDeck()[Math.floor(Math.random() * deckSize)]);
+  let deckOfCards = buildFullDeck();
+
+  for (let i = 0; i < 5; i++) {
+    [cards[i], deckOfCards] = spliceCard(deckOfCards);
+  }
 
   return cards;
 };
@@ -58,18 +51,17 @@ describe('check that random hands work', () => {
     wish(randomHand().length === 5);
   })
 });
-describe('randomCard()', () => {
-  it('returns something', () => {
-    wish(randomCard().match(/\w{1,2}-[HDSC]/));
+
+
+describe('spliceCard()', function() {
+  it('returns two things', function() {
+    wish(spliceCard(buildFullDeck()).length === 2);
   });
-});
-describe('randomValue()', () => {
-  it('returns something', () => {
-    wish(randomValue().match(/\w{1,2}/));
+  it('returns the selected card', function() {
+    wish(spliceCard(buildFullDeck())[0].match(/\w{1,2}-[HDSC]/));
   });
-});
-describe('randomSuit()', () => {
-  it('returns something', () => {
-    wish(randomSuit().match(/[HDSC]/));
+  it('returns an array with one card gone', function() {
+    wish(spliceCard(buildFullDeck())[1].length ===
+      buildFullDeck().length - 1);
   });
 });
