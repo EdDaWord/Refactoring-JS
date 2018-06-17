@@ -1,22 +1,144 @@
 var wish = require('wish');
+var deepEqual = require('deep-equal');
 
 function checkHand(hand) {
-  if (isPair(hand)) {
+
+  if (isTwoPair(hand)) {
+    return 'two pair';
+  } else if (isPair(hand)) {
     return 'pair';
-  } else {
+  } else if (isFullHouse(hand)) {
+    return 'full house';
+  } else if (isTriple(hand)) {
     return 'three of a kind';
+  } else if (isQuadruple(hand)) {
+    return 'four of a kind';
+  } else if (isStraightFlush(hand)) {
+    return 'straight flush';
+  } else if (isFlush(hand)) {
+    return 'flush';
+  } else if (isStraight(hand)) {
+    return 'straight'
+  } else {
+    return 'high card';
   }
 };
+
+function isTwoPair(hand) {
+  var theCounts = allCounts(valuesFromHand(hand));
+  return (theCounts[0] === 2 && theCounts[1] === 2);
+}
+
+function isFullHouse(hand) {
+  var theCounts = allCounts(valuesFromHand(hand));
+  return (theCounts[0] === 3 && theCounts[1] === 2);
+}
+
+
+function allCounts(values) {
+  var counts = {};
+  values.forEach(function(value, index) {
+    counts[value] = 0;
+    if (value == values[0]) {
+      counts[value] = counts[value] + 1;
+    };
+    if (value == values[1]) {
+      counts[value] = counts[value] + 1;
+    };
+    if (value == values[2]) {
+      counts[value] = counts[value] + 1;
+    };
+    if (value == values[3]) {
+      counts[value] = counts[value] + 1;
+    };
+    if (value == values[4]) {
+      counts[value] = counts[value] + 1;
+    };
+  });
+  var totalCounts = Object.keys(counts).map(function(key) {
+    return counts[key];
+  });
+  return totalCounts.sort(function(a, b) {
+    return b - a
+  });
+};
+
+function isStraightFlush(hand) {
+  return isStraight(hand) && isFlush(hand);
+}
+
+function isStraight(hand) {
+  return cardsInSequence(valuesFromHand(hand));
+}
+
+function cardsInSequence(hand) {
+  hand.sort((a, b) => a - b);
+
+  for (let i = 1; i < hand.length; i++) {
+    let omfg = parseInt(hand[i - 1], 10);
+    let ffs = parseInt(hand[i], 10);
+
+    if (omfg + 1 != ffs) {
+      return false;
+    }
+  }
+
+  return true;
+}
+
+function isFlush(hand) {
+  return allTheSameSuit(suitsFor(hand));
+}
+
+function suitsFor(hand) {
+  return hand.map(card => {
+    return card.split('-')[1];
+  })
+}
+
+function allTheSameSuit(suits) {
+  for (let i = 0; i < suits.length; i++) {
+    if (suits[i] !== suits[0]) {
+      return false;
+    }
+  }
+  return true;
+}
 
 function isPair(hand) {
   return multiplesIn(hand) === 2;
 };
 
+function isTriple(hand) {
+  return multiplesIn(hand) === 3;
+}
+
+function isQuadruple(hand) {
+  return multiplesIn(hand) === 4;
+}
+
 function multiplesIn(hand) {
   return highestCount(valuesFromHand(hand));
 };
 
-function highestCount(values) {};
+function highestCount(values) {
+  var counts = {};
+  let highestCountForValue = 0;
+
+  values.forEach((value, index) => {
+    if (counts[value] === undefined) {
+      counts[value] = 1;
+    } else {
+      counts[value]++;
+    }
+
+    if (counts[value] > highestCountForValue) {
+      highestCountForValue = counts[value];
+    }
+  });
+
+  return highestCountForValue;
+};
 
 function valuesFromHand(hand) {
   return hand.map(function(card) {
@@ -27,7 +149,7 @@ function valuesFromHand(hand) {
 describe('valuesFromHand()', function() {
   it('returns just the values from a hand', function() {
     var result = valuesFromHand(['2-H', '3-C', '4-D', '5-H', '2-C']);
-    wish(result === ['2', '3', '4', '5', '2']);
+    wish(deepEqual(result, ['2', '3', '4', '5', '2']));
   });
 });
 
@@ -46,17 +168,64 @@ describe('multiplesIn()', function() {
   });
 });
 
+describe('allTheSameSuit()', function() {
+  it('reports true if elements are the same', function() {
+    var result = allTheSameSuit(['D', 'D', 'D', 'D', 'D']);
+    wish(result);
+  });
+  it('reports false if elements are not the same', function() {
+    var result = allTheSameSuit(['D', 'H', 'D', 'D', 'D']);
+    wish(!result);
+  });
+});
+
 describe('checkHand()', function() {
+  it('handles straight', function() {
+    var result = checkHand(['1-H', '2-H', '3-H', '4-H', '5-D']);
+    wish(result === 'straight');
+  });
+
+  it('handles high card', function() {
+    var result = checkHand(['2-H', '5-C', '9-D', '7-S', '3-H']);
+    console.log('result high card:', result);
+    wish(result === 'high card');
+  });
+
   it('handles pairs', function() {
     var result = checkHand(['2-H', '3-C', '4-D', '5-H', '2-C']);
     wish(result === 'pair');
-    var anotherResult = checkHand(['3-H', '3-C',
-      '4-D', '5-H', '2-C'
-    ]);
+
+    var anotherResult = checkHand(['3-H', '3-C', '4-D', '5-H', '2-C']);
     wish(anotherResult === 'pair');
   });
+
   it('handles three of a kind', function() {
     var result = checkHand(['3-H', '3-C', '3-D', '5-H', '2-H']);
     wish(result === 'three of a kind');
+  });
+
+  it('handles four of a kind', function() {
+    var result = checkHand(['3-H', '3-C', '3-D', '3-S', '2-H']);
+    wish(result === 'four of a kind');
+  });
+
+  it('handles flush', function() {
+    var result = checkHand(['2-H', '5-H', '9-H', '7-H', '3-H']);
+    wish(result === 'flush');
+  });
+
+  it('handles straight flush', function() {
+    var result = checkHand(['1-H', '2-H', '3-H', '4-H', '5-H']);
+    wish(result === 'straight flush');
+  });
+
+  it('handles full house', function() {
+    var result = checkHand(['2-D', '2-H', '3-H', '3-D', '3-C']);
+    wish(result === 'full house');
+  });
+
+  it('handles two pair', function() {
+    var result = checkHand(['2-D', '2-H', '3-H', '3-D', '8-D']);
+    wish(result === 'two pair');
   });
 });
