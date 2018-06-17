@@ -1,13 +1,10 @@
 # Refactoring Javascript by Evan Burchard
 
-# Run
+## Run
 `npm run test [name of file]` // cards.js
-
-
 
 # Notes
 
-# How to start refactoring?
 **TESTS**
   - Getting the right outputs for given inputs. This means writing tests first, and not worrying about performance until the tests are written.
   - Tests are the key factor which allows for refactoring
@@ -18,7 +15,7 @@ The EVAN principle (lol)
   Avoid impure functions when possible
   Name variables and functions well
 
-# Writing tests
+## Writing tests
 Three steps to a test
   1. The setup
   2. The assertion
@@ -35,27 +32,22 @@ How it is done
 
   REFACTOR, and small commits
 
-# The Slow Test
+## The Slow Test
 Debugging and Regression tests, page 79
 
 A tests that is run ever so often. For example, `randomDeckOfCards` . Shouldn’t be run every time but needs to be run ever so often.
 
+## Signs a function should be refactored
+  - Too bulky? Split it up
+    - Aim for that middle ground of more then 3 and less then 25 lines per function.
+  - Too many paths and hard to follow? Split it up
+  - Too little and only called once? Inline it
+  - Keep side effects to a minimum or nonexistent
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+### OOP things in JS
+  - Classes (sweet sweet sugar)
+  - Chaining functions `[].doSomething().doSomethingElse()`
+  - Private variables and classes
 
 
 
