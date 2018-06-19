@@ -1,3 +1,7 @@
+const EASY = 'easy';
+const MEDIUM = 'medium';
+const HARD = 'hard';
+
 // songs
 let imagine = ['c', 'cmaj7', 'f', 'am', 'dm', 'g', 'e7'];
 let somewhere_over_the_rainbow = ['c', 'em', 'f', 'g', 'am'];
@@ -27,7 +31,7 @@ function train(chords, label) {
     }
   }
 
-  if (!!(Object.keys(labelCounts).includes(label))) {
+  if (Object.keys(labelCounts).includes(label)) {
     labelCounts[label] = labelCounts[label] + 1; // A hashmap of all the labels and how many times they've been fed in
   } else {
     labelCounts[label] = 1;
@@ -67,39 +71,40 @@ function setProbabilityOfChordsInLabels() {
 
   Object.keys(probabilityOfChordsInLabels).forEach(difficulty => {
     Object.keys(probabilityOfChordsInLabels[difficulty]).forEach(chords => {
-      let chance = probabilityOfChordsInLabels[difficulty][chords] * 1.0 / songs.length;
+      let chance = probabilityOfChordsInLabels[difficulty][chords] / songs.length;
       probabilityOfChordsInLabels[difficulty][chords] = chance;
     });
   });
 }
 
-train(imagine, 'easy');
-train(somewhere_over_the_rainbow, 'easy');
-train(tooManyCooks, 'easy');
-train(iWillFollowYouIntoTheDark, 'medium');
-train(babyOneMoreTime, 'medium');
-train(creep, 'medium');
-train(paperBag, 'hard');
-train(toxic, 'hard');
-train(bulletproof, 'hard');
+train(imagine, EASY);
+train(somewhere_over_the_rainbow, EASY);
+train(tooManyCooks, EASY);
+train(iWillFollowYouIntoTheDark, MEDIUM);
+train(babyOneMoreTime, MEDIUM);
+train(creep, MEDIUM);
+train(paperBag, HARD);
+train(toxic, HARD);
+train(bulletproof, HARD);
 
 setLabelProbabilities();
 setChordCountsInLabels();
 setProbabilityOfChordsInLabels();
 
 function classify(chords) {
+  const SMOOTHING = 1.01;
+
   console.log(labelProbabilities);
 
   var classified = {};
 
   Object.keys(labelProbabilities).forEach(difficulty => {
-    var first = labelProbabilities[difficulty] + 1.01;
+    var first = labelProbabilities[difficulty] + SMOOTHING;
     chords.forEach(chord => {
       var probabilityOfChordInLabel = probabilityOfChordsInLabels[difficulty][chord];
-      if (probabilityOfChordInLabel === undefined) {
-        first + 1.01;
-      } else {
-        first = first * (probabilityOfChordInLabel + 1.01);
+
+      if (probabilityOfChordInLabel !== undefined) {
+        first = first * (probabilityOfChordInLabel + SMOOTHING);
       }
     });
 
