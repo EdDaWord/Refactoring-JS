@@ -1,4 +1,5 @@
 let fs = require('fs');
+
 // songs
 let imagine = ['c', 'cmaj7', 'f', 'am', 'dm', 'g', 'e7'];
 let somewhere_over_the_rainbow = ['c', 'em', 'f', 'g', 'am'];
@@ -7,14 +8,10 @@ let iWillFollowYouIntoTheDark = ['f', 'dm', 'bb', 'c', 'a', 'bbm'];
 let babyOneMoreTime = ['cm', 'g', 'bb', 'eb', 'fm', 'ab'];
 let creep = ['g', 'gsus4', 'b', 'bsus4', 'c', 'cmsus4', 'cm6'];
 let army = ['ab', 'ebm7', 'dbadd9', 'fm7', 'bbm', 'abmaj7', 'ebm'];
-let paperBag = ['bm7', 'e', 'c', 'g', 'b7', 'f', 'em', 'a', 'cmaj7',
-  'em7', 'a7', 'f7', 'b'
-];
-let toxic = ['cm', 'eb', 'g', 'cdim', 'eb7', 'd7', 'db7', 'ab', 'gmaj7',
-  'g7'
-];
+let paperBag = ['bm7', 'e', 'c', 'g', 'b7', 'f', 'em', 'a', 'cmaj7', 'em7', 'a7', 'f7', 'b'];
+let toxic = ['cm', 'eb', 'g', 'cdim', 'eb7', 'd7', 'db7', 'ab', 'gmaj7', 'g7'];
 let bulletproof = ['d#m', 'g#', 'b', 'f#', 'g#m', 'c#'];
-let song_11 = [];
+let blankSong = [];
 
 var songs = [];
 var labels = [];
@@ -50,20 +47,20 @@ function setLabelProbabilities() {
 };
 
 function setChordCountsInLabels() {
-  songs.forEach(labelChordPair => {
-    let label = chordCountsInLabels[labelChordPair[0]];
+  songs.forEach(song => {
+    let label = chordCountsInLabels[song[0]];
 
     if (label === undefined) {
-      chordCountsInLabels[labelChordPair[0]] = {};
+      chordCountsInLabels[song[0]] = {};
     }
 
-    let chords = labelChordPair[1];
+    let chords = song[1];
 
     chords.forEach(chord => {
-      if (chordCountsInLabels[labelChordPair[0]][chord] > 0) {
-        chordCountsInLabels[labelChordPair[0]][chord]++;
+      if (chordCountsInLabels[song[0]][chord] > 0) {
+        chordCountsInLabels[song[0]][chord]++;
       } else {
-        chordCountsInLabels[labelChordPair[0]][chord] = 1;
+        chordCountsInLabels[song[0]][chord] = 1;
       }
     });
   });
@@ -72,10 +69,10 @@ function setChordCountsInLabels() {
 function setProbabilityOfChordsInLabels() {
   probabilityOfChordsInLabels = chordCountsInLabels;
 
-  Object.keys(probabilityOfChordsInLabels).forEach(label => {
-    Object.keys(probabilityOfChordsInLabels[label]).forEach( chords => {
-      let chance = probabilityOfChordsInLabels[label][chords] * 1.0 / songs.length;
-      probabilityOfChordsInLabels[label][chords] = chance;
+  Object.keys(probabilityOfChordsInLabels).forEach(difficulty => {
+    Object.keys(probabilityOfChordsInLabels[difficulty]).forEach(chords => {
+      let chance = probabilityOfChordsInLabels[difficulty][chords] * 1.0 / songs.length;
+      probabilityOfChordsInLabels[difficulty][chords] = chance;
     });
   });
 }
@@ -95,12 +92,12 @@ setChordCountsInLabels();
 setProbabilityOfChordsInLabels();
 
 function classify(chords) {
-  var ttal = labelProbabilities;
-  console.log(ttal);
+  var total = labelProbabilities;
+  console.log(total);
 
   var classified = {};
 
-  Object.keys(ttal).forEach(obj => {
+  Object.keys(total).forEach(obj => {
     var first = labelProbabilities[obj] + 1.01;
     chords.forEach(chord => {
       var probabilityOfChordInLabel = probabilityOfChordsInLabels[obj][chord];
