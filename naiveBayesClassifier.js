@@ -1,5 +1,3 @@
-let fs = require('fs');
-
 // songs
 let imagine = ['c', 'cmaj7', 'f', 'am', 'dm', 'g', 'e7'];
 let somewhere_over_the_rainbow = ['c', 'em', 'f', 'g', 'am'];
@@ -7,11 +5,9 @@ let tooManyCooks = ['c', 'g', 'f'];
 let iWillFollowYouIntoTheDark = ['f', 'dm', 'bb', 'c', 'a', 'bbm'];
 let babyOneMoreTime = ['cm', 'g', 'bb', 'eb', 'fm', 'ab'];
 let creep = ['g', 'gsus4', 'b', 'bsus4', 'c', 'cmsus4', 'cm6'];
-let army = ['ab', 'ebm7', 'dbadd9', 'fm7', 'bbm', 'abmaj7', 'ebm'];
 let paperBag = ['bm7', 'e', 'c', 'g', 'b7', 'f', 'em', 'a', 'cmaj7', 'em7', 'a7', 'f7', 'b'];
 let toxic = ['cm', 'eb', 'g', 'cdim', 'eb7', 'd7', 'db7', 'ab', 'gmaj7', 'g7'];
 let bulletproof = ['d#m', 'g#', 'b', 'f#', 'g#m', 'c#'];
-let blankSong = [];
 
 var songs = [];
 var labels = [];
@@ -92,15 +88,14 @@ setChordCountsInLabels();
 setProbabilityOfChordsInLabels();
 
 function classify(chords) {
-  var total = labelProbabilities;
-  console.log(total);
+  console.log(labelProbabilities);
 
   var classified = {};
 
-  Object.keys(total).forEach(obj => {
-    var first = labelProbabilities[obj] + 1.01;
+  Object.keys(labelProbabilities).forEach(difficulty => {
+    var first = labelProbabilities[difficulty] + 1.01;
     chords.forEach(chord => {
-      var probabilityOfChordInLabel = probabilityOfChordsInLabels[obj][chord];
+      var probabilityOfChordInLabel = probabilityOfChordsInLabels[difficulty][chord];
       if (probabilityOfChordInLabel === undefined) {
         first + 1.01;
       } else {
@@ -108,7 +103,7 @@ function classify(chords) {
       }
     });
 
-    classified[obj] = first;
+    classified[difficulty] = first;
   });
 
   console.log(classified);
