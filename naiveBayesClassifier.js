@@ -27,40 +27,43 @@ var probabilityOfChordsInLabels = {};
 function train(chords, label) {
   songs.push([label, chords]);
   labels.push(label);
+
   for (var i = 0; i < chords.length; i++) {
     if (!allChords.includes(chords[i])) {
-      allChords.push(chords[i]);
+      allChords.push(chords[i]); // a hashset of every single cord that has been fed in
     }
   }
+
   if (!!(Object.keys(labelCounts).includes(label))) {
-    labelCounts[label] = labelCounts[label] + 1;
+    labelCounts[label] = labelCounts[label] + 1; // A hashmap of all the labels and how many times they've been fed in
   } else {
     labelCounts[label] = 1;
   }
 };
 
-function getNumberOfSongs() {
-  return songs.length;
-};
-
 function setLabelProbabilities() {
-  Object.keys(labelCounts).forEach(function(label) {
-    var numberOfSongs = getNumberOfSongs();
-    labelProbabilities[label] = labelCounts[label] / numberOfSongs;
+  var numberOfSongs = songs.length;
+
+  Object.keys(labelCounts).forEach(label => {
+    labelProbabilities[label] = labelCounts[label] / numberOfSongs; // the probability of each label in the total memory
   });
 };
 
 function setChordCountsInLabels() {
-  songs.forEach(function(i) {
-    if (chordCountsInLabels[i[0]] === undefined) {
-      chordCountsInLabels[i[0]] = {};
+  songs.forEach(labelChordPair => {
+    let label = chordCountsInLabels[labelChordPair[0]];
+
+    if (label === undefined) {
+      chordCountsInLabels[labelChordPair[0]] = {};
     }
-    i[1].forEach(function(j) {
-      if (chordCountsInLabels[i[0]][j] > 0) {
-        chordCountsInLabels[i[0]][j] =
-          chordCountsInLabels[i[0]][j] + 1;
+
+    let chords = labelChordPair[1];
+
+    chords.forEach(chord => {
+      if (chordCountsInLabels[labelChordPair[0]][chord] > 0) {
+        chordCountsInLabels[labelChordPair[0]][chord]++;
       } else {
-        chordCountsInLabels[i[0]][j] = 1;
+        chordCountsInLabels[labelChordPair[0]][chord] = 1;
       }
     });
   });
@@ -68,10 +71,11 @@ function setChordCountsInLabels() {
 
 function setProbabilityOfChordsInLabels() {
   probabilityOfChordsInLabels = chordCountsInLabels;
-  Object.keys(probabilityOfChordsInLabels).forEach(function(i) {
-    Object.keys(probabilityOfChordsInLabels[i]).forEach(function(j) {
-      probabilityOfChordsInLabels[i][j] =
-        probabilityOfChordsInLabels[i][j] * 1.0 / songs.length;
+
+  Object.keys(probabilityOfChordsInLabels).forEach(label => {
+    Object.keys(probabilityOfChordsInLabels[label]).forEach( chords => {
+      let chance = probabilityOfChordsInLabels[label][chords] * 1.0 / songs.length;
+      probabilityOfChordsInLabels[label][chords] = chance;
     });
   });
 }
@@ -85,6 +89,7 @@ train(creep, 'medium');
 train(paperBag, 'hard');
 train(toxic, 'hard');
 train(bulletproof, 'hard');
+
 setLabelProbabilities();
 setChordCountsInLabels();
 setProbabilityOfChordsInLabels();
@@ -92,10 +97,12 @@ setProbabilityOfChordsInLabels();
 function classify(chords) {
   var ttal = labelProbabilities;
   console.log(ttal);
+
   var classified = {};
-  Object.keys(ttal).forEach(function(obj) {
+
+  Object.keys(ttal).forEach(obj => {
     var first = labelProbabilities[obj] + 1.01;
-    chords.forEach(function(chord) {
+    chords.forEach(chord => {
       var probabilityOfChordInLabel = probabilityOfChordsInLabels[obj][chord];
       if (probabilityOfChordInLabel === undefined) {
         first + 1.01;
@@ -103,8 +110,10 @@ function classify(chords) {
         first = first * (probabilityOfChordInLabel + 1.01);
       }
     });
+
     classified[obj] = first;
   });
+
   console.log(classified);
 };
 

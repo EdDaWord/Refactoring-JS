@@ -49,6 +49,12 @@ A tests that is run ever so often. For example, `randomDeckOfCards` . Shouldn’
   - Chaining functions `[].doSomething().doSomethingElse()`
   - Private variables and classes
 
+## Working example of JS refactoring
+ Naive Bayes Classifier (NBC)
+
+The code `naiveBayesClassifier.js` is a simple algorithm that is feed in pairs of data `[ difficulty, chords ] ` and after classifying a bunch of training data, it can now make predictions on how difficult a bunch of chords are based on the percentage of chords that belong to the each category in the training data. It’s a calculator that tells you if your chords are hard to play.
+
+
 
 
 
